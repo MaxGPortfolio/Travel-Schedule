@@ -16,9 +16,20 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .padding()
+        .onAppear {
+            APITester.testFetchStations()
+            APITester.testSearchRoutes()
+            APITester.testStationSchedule()
+            APITester.testAllStations()
+            APITester.testCarrierInfo()
+            APITester.testCopyright()
+            APITester.testNearestSettlement()
+            APITester.testThreadStations()
+        }
     }
 }
 
 #Preview {
     ContentView()
 }
+
