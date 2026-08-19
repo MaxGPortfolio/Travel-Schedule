@@ -49,8 +49,10 @@ struct StationSelectionView: View {
             .frame(
                 height: 36,
             )
-            .background(.ypLightGray)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .background {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.ypLightGray)
+            }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             

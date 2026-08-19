@@ -51,8 +51,10 @@ struct CitySelectionView: View {
             .frame(
                 height: 36,
             )
-            .background(.ypLightGray)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .background {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.ypLightGray)
+            }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             
@@ -78,14 +80,22 @@ struct CitySelectionView: View {
                             }
                         )
                     } label: {
-                        Text(city)
-                            .foregroundStyle(.primary)
-                            .frame(
-                                maxWidth: .infinity,
-                                minHeight: 60,
-                                alignment: .leading
-                            )
+                        HStack {
+                            Text(city)
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.primary)
+                        }
+                        .frame(
+                            maxWidth: .infinity,
+                            minHeight: 60,
+                            alignment: .leading
+                        )
                     }
+                    .navigationLinkIndicatorVisibility(.hidden)
                     .listRowInsets(
                         EdgeInsets(
                             top: 0,
@@ -96,7 +106,6 @@ struct CitySelectionView: View {
                     )
                     .listRowSeparator(.hidden)
                 }
-                
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .contentMargins(.top, 0, for: .scrollContent)
@@ -110,6 +119,7 @@ struct CitySelectionView: View {
                     dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
+                        .foregroundStyle(.primary)
                 }
             }
         }

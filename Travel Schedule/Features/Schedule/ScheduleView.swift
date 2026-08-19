@@ -48,7 +48,7 @@ struct ScheduleView: View {
                             .padding()
                         }
                     }
-                    .background(.ypWhiteDay)
+                    .background(.ypJustWhite)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     
                     Button {

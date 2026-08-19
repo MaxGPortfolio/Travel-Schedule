@@ -23,7 +23,7 @@ struct RouteCardView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(route.carrierName)
                         .font(.system(size: 17, weight: .regular))
-                        .foregroundStyle(.ypBlackDay)
+                        .foregroundStyle(.ypJustBlack)
                     if let transferDescription = route.transferDescription {
                         Text(transferDescription)
                             .font(.system(size: 12, weight: .regular))
@@ -55,7 +55,7 @@ struct RouteCardView: View {
                     )
                 )
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(.ypBlackDay)
+                    .foregroundStyle(.ypJustBlack)
                 
                 Rectangle()
                     .frame(height: 1)
@@ -65,7 +65,7 @@ struct RouteCardView: View {
                 
                 Text(route.duration)
                     .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(.ypBlackDay)
+                    .foregroundStyle(.ypJustBlack)
                 
                 Spacer(minLength: 1)
                 
@@ -80,14 +80,14 @@ struct RouteCardView: View {
                     )
                 )
                 .font(.system(size: 17, weight: .regular))
-                .foregroundStyle(.ypBlackDay)
+                .foregroundStyle(.ypJustBlack)
                 
             }
             .padding(.horizontal, 14)
             .padding(.top, 14)
             .padding(.bottom, 14)
         }
-        .background(.ypLightGray)
+        .background(.ypJustLightGray)
         .clipShape(RoundedRectangle(cornerRadius: 24))
     }
 }

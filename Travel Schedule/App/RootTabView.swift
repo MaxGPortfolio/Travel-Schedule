@@ -9,22 +9,32 @@ import SwiftUI
 
 struct RootTabView: View {
     @State private var selectedTab: AppTab = .schedule
-    
+
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
                 ScheduleView()
             }
             .tabItem {
-                Image(.scheduleIcon)
+                Image(
+                    selectedTab == .schedule
+                        ? .scheduleIconSelected
+                        : .scheduleIcon
+                )
+                .renderingMode(.original)
             }
             .tag(AppTab.schedule)
-            
+
             NavigationStack {
                 SettingsView()
             }
             .tabItem {
-                Image(.settingsIcon)
+                Image(
+                    selectedTab == .settings
+                        ? .settingsIconSelected
+                        : .settingsIcon
+                )
+                .renderingMode(.original)
             }
             .tag(AppTab.settings)
         }
