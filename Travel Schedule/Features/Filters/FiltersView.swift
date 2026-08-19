@@ -11,7 +11,7 @@ struct FiltersView: View {
     @Environment(\.dismiss) private var dismiss
     let onApply: (RouteFilters) -> Void
     private var hasSelectedFilters: Bool {
-        !filters.selectedTimes.isEmpty && filters.showTransfers != nil
+        !filters.selectedTimes.isEmpty || filters.showTransfers != nil
     }
     @State private var filters: RouteFilters
     
