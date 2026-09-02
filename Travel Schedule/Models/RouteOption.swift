@@ -9,12 +9,12 @@ import Foundation
 
 struct RouteOption: Identifiable, Hashable {
     let id: UUID
-    let carrierName: String
-    let logoName: String
+    let carrier: Carrier
     let routeDate: Date
     let departureTime: Date
     let arrivalTime: Date
     let duration: String
     let transferDescription: String?
 }
+
 

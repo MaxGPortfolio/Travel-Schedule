@@ -13,7 +13,7 @@ struct RouteCardView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 4) {
-                Image(route.logoName)
+                Image(route.carrier.logoName)
                     .frame(
                         maxWidth: 38,
                         minHeight: 38,
@@ -21,7 +21,7 @@ struct RouteCardView: View {
                     .padding(.leading, 0)
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(route.carrierName)
+                    Text(route.carrier.name)
                         .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(.ypJustBlack)
                     if let transferDescription = route.transferDescription {
@@ -30,7 +30,6 @@ struct RouteCardView: View {
                             .foregroundStyle(.ypRed)
                     }
                 }
-                
                 Spacer()
                 
                 Text(
