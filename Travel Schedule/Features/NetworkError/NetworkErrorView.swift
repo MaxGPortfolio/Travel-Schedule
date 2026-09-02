@@ -26,7 +26,7 @@ struct NetworkErrorView: View {
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.ypWhiteDay)
+        .background(Color.ypWhiteDay.ignoresSafeArea())
     }
 }
 

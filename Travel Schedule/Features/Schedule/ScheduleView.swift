@@ -11,10 +11,38 @@ struct ScheduleView: View {
     @State private var selectedRoutePoint: RoutePointKind?
     @State private var departure: RoutePoint?
     @State private var destination: RoutePoint?
+    @State private var selectedStoryGroup: StoryGroup?
+    @State private var viewedStoryGroupIDs: Set<Int> = []
+    
+    private var orderedStoryGroups: [StoryGroup] {
+        let unviewed = MockData.storyGroups.filter {
+            !viewedStoryGroupIDs.contains($0.id)
+        }
+
+        let viewed = MockData.storyGroups.filter {
+            viewedStoryGroupIDs.contains($0.id)
+        }
+
+        return unviewed + viewed
+    }
     
     var body: some View {
         VStack(spacing: 20) {
-            HStack {
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 12) {
+                    ForEach(orderedStoryGroups) { storyGroup in
+                        Button {
+                            selectedStoryGroup = storyGroup
+                        } label: {
+                            StoryCardView(
+                                storyGroup: storyGroup,
+                                isViewed: viewedStoryGroupIDs.contains(storyGroup.id)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
             }
             .frame(height: 188)
             
@@ -87,23 +115,18 @@ struct ScheduleView: View {
                 maxHeight: .infinity,
                 alignment: .top
             )
-            .fullScreenCover(item: $selectedRoutePoint) { routePointKind in
-                NavigationStack {
-                    CitySelectionView(
-                        onRoutePointSelected: { selectedPoint in
-                            switch routePointKind {
-                            case .departure:
-                                departure = selectedPoint
-                                
-                            case .destination:
-                                destination = selectedPoint
-                            }
-                            
-                            selectedRoutePoint = nil
-                        }
-                    )
-                }
+            .fullScreenCover(item: $selectedStoryGroup) { storyGroup in
+                StoriesView(
+                    storyGroup: storyGroup,
+                    onGroupViewed: {
+                        viewedStoryGroupIDs.insert(storyGroup.id)
+                    }
+                )
             }
+        }
+        .background {
+            Color(.ypWhiteDay)
+                .ignoresSafeArea()
         }
     }
 }

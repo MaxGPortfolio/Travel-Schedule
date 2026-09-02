@@ -8,11 +8,53 @@
 import Foundation
 
 enum MockData {
+    static let storyGroups: [StoryGroup] = (1...9).map { groupID in
+        StoryGroup(
+            id: groupID,
+            previewImageName: "Preview\(groupID)",
+            previewTitle: "Text Text Text Text Text Text Text Text Text Text Text Text",
+            stories: [
+                Story(
+                    id: groupID * 10 + 1,
+                    imageName: "StoryBig\(groupID)1",
+                    title: "Text Text Text Text Text Text Text Text Text Text Text Text Text Text",
+                    description: "Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text"
+                ),
+                Story(
+                    id: groupID * 10 + 2,
+                    imageName: "StoryBig\(groupID)2",
+                    title: "Text Text Text Text Text Text Text Text Text Text Text Text Text Text",
+                    description: "Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text"
+                )
+            ]
+        )
+    }
+    
+    static let rzd = Carrier(
+        name: "ОАО \"РЖД\"",
+        logoName: "RzdBrandLogo",
+        email: "info@rzd.ru",
+        phone: "+7 ..."
+    )
+    
+    static let fgc = Carrier(
+        name: "АО \"ФГК\"",
+        logoName: "FgcBrandLogo",
+        email: "...",
+        phone: "..."
+    )
+    
+    static let ural = Carrier(
+        name: "ООО \"Урал логистика\"",
+        logoName: "UralBrandLogo",
+        email: "...",
+        phone: "..."
+    )
+    
     static let routeOptions: [RouteOption] = [
         RouteOption(
             id: UUID(),
-            carrierName: "РЖД",
-            logoName: "RzdBrandLogo",
+            carrier: MockData.rzd,
             routeDate: makeDate(day: 14, hour: 0, minute: 0),
             departureTime: makeDate(day: 14, hour: 22, minute: 30),
             arrivalTime: makeDate(day: 15, hour: 8, minute: 15),
@@ -22,30 +64,27 @@ enum MockData {
         
         RouteOption(
             id: UUID(),
-            carrierName: "ФГК",
-            logoName: "FgcBrandLogo",
+            carrier: MockData.fgc,
             routeDate: makeDate(day: 15, hour: 0, minute: 0),
             departureTime: makeDate(day: 15, hour: 1, minute: 15),
             arrivalTime: makeDate(day: 15, hour: 9, minute: 0),
             duration: "9 часов",
             transferDescription: nil
         ),
-
+        
         RouteOption(
             id: UUID(),
-            carrierName: "Урал логистика",
-            logoName: "UralBrandLogo",
+            carrier: MockData.ural,
             routeDate: makeDate(day: 16, hour: 0, minute: 0),
             departureTime: makeDate(day: 16, hour: 12, minute: 30),
             arrivalTime: makeDate(day: 16, hour: 21, minute: 0),
             duration: "9 часов",
             transferDescription: nil
         ),
-
+        
         RouteOption(
             id: UUID(),
-            carrierName: "РЖД",
-            logoName: "RzdBrandLogo",
+            carrier: MockData.rzd,
             routeDate: makeDate(day: 17, hour: 0, minute: 0),
             departureTime: makeDate(day: 17, hour: 22, minute: 30),
             arrivalTime: makeDate(day: 18, hour: 8, minute: 15),
@@ -65,7 +104,7 @@ enum MockData {
                 title: "Курский вокзал"
             )
         ],
-
+        
         "Санкт-Петербург": [
             Station(
                 code: "s9602494",
@@ -87,7 +126,7 @@ enum MockData {
                 title: "Адлер"
             )
         ],
-
+        
         "Горный воздух": [
             Station(
                 code: "mock-gorny-1",
@@ -98,7 +137,7 @@ enum MockData {
                 title: "Южно-Сахалинск"
             )
         ],
-
+        
         "Краснодар": [
             Station(
                 code: "mock-krasnodar-1",
@@ -109,7 +148,7 @@ enum MockData {
                 title: "Краснодар-2"
             )
         ],
-
+        
         "Казань": [
             Station(
                 code: "mock-kazan-1",
@@ -120,7 +159,7 @@ enum MockData {
                 title: "Восстание-Пасс."
             )
         ],
-
+        
         "Омск": [
             Station(
                 code: "mock-omsk-1",

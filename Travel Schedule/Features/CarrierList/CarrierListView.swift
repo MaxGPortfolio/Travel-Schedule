@@ -53,7 +53,7 @@ struct CarrierListView: View {
                     LazyVStack(spacing: 8) {
                         ForEach(filteredRoutes) { route in
                             NavigationLink {
-                                CarrierInfoView()
+                                CarrierInfoView(carrier: route.carrier)
                             } label: {
                                 RouteCardView(route: route)
                             }
@@ -82,6 +82,7 @@ struct CarrierListView: View {
                     .padding(.bottom, 24)
             }
         }
+        .background(Color.ypWhiteDay.ignoresSafeArea())
         .padding(.horizontal, 16)
         .toolbar(.hidden, for: .tabBar)
     }

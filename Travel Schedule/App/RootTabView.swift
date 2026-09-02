@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootTabView: View {
     @State private var selectedTab: AppTab = .schedule
+    @State private var isDarkMode: Bool = false
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -26,7 +27,7 @@ struct RootTabView: View {
             .tag(AppTab.schedule)
 
             NavigationStack {
-                SettingsView()
+                SettingsView(isDarkMode: $isDarkMode)
             }
             .tabItem {
                 Image(
@@ -38,6 +39,7 @@ struct RootTabView: View {
             }
             .tag(AppTab.settings)
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
 

@@ -95,6 +95,7 @@ struct CitySelectionView: View {
                             alignment: .leading
                         )
                     }
+                    .listRowBackground(Color.ypWhiteDay)
                     .navigationLinkIndicatorVisibility(.hidden)
                     .listRowInsets(
                         EdgeInsets(
@@ -123,6 +124,7 @@ struct CitySelectionView: View {
                 }
             }
         }
+        .background(Color.ypWhiteDay.ignoresSafeArea())
     }
 }
 

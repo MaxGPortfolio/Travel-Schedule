@@ -94,12 +94,14 @@ struct StationSelectionView: View {
                         )
                     )
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color.ypWhiteDay)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .contentMargins(.top, 0, for: .scrollContent)
             }
         }
+        .background(Color.ypWhiteDay.ignoresSafeArea())
         .navigationTitle("Выбор станции")
         .navigationBarTitleDisplayMode(.inline)
     }
