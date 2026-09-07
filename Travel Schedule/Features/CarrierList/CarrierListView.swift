@@ -8,84 +8,124 @@
 import SwiftUI
 
 struct CarrierListView: View {
-    let departure: RoutePoint
-    let destination: RoutePoint
-    let routes: [RouteOption]
-    @State private var appliedFilters = RouteFilters(selectedTimes: [], showTransfers: nil)
-    private var filteredRoutes: [RouteOption] {
-        routes.filter { route in
-            let matchesTime =
-                appliedFilters.selectedTimes.isEmpty
-                || appliedFilters.selectedTimes.contains { time in
-                    time.contains(route.departureTime)
-                }
-            
-            let matchesTransfers: Bool
-            
-            if appliedFilters.showTransfers == false {
-                matchesTransfers = route.transferDescription == nil
-            } else {
-                matchesTransfers = true
-            }
-            
-            return matchesTime && matchesTransfers
-        }
+    @StateObject private var viewModel: CarrierListViewModel
+
+    private let networkClient: NetworkClient
+
+    init(
+        departure: RoutePoint,
+        destination: RoutePoint,
+        routes: [RouteOption],
+        networkClient: NetworkClient
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: CarrierListViewModel(
+                departure: departure,
+                destination: destination,
+                routes: routes,
+                networkClient: networkClient
+            )
+        )
+
+        self.networkClient = networkClient
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text(
-                "\(departure.displayTitle) → \(destination.displayTitle)"
-            )
-            .font(.system(size: 24, weight: .bold))
-            .foregroundStyle(.ypBlackDay)
-            
-            if filteredRoutes.isEmpty {
-                Text("Вариантов нет")
+        Group {
+            if viewModel.isLoading {
+                ProgressView()
                     .frame(
                         maxWidth: .infinity,
                         maxHeight: .infinity
                     )
-                    .foregroundStyle(.ypBlackDay)
-                    .font(.system(size: 24, weight: .bold))
+            } else if let errorType = viewModel.errorType {
+                NetworkErrorView(errorType: errorType)
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(filteredRoutes) { route in
-                            NavigationLink {
-                                CarrierInfoView(carrier: route.carrier)
-                            } label: {
-                                RouteCardView(route: route)
+                VStack(spacing: 16) {
+                    Text(
+                        "\(viewModel.departure.displayTitle) → "
+                            + "\(viewModel.destination.displayTitle)"
+                    )
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundStyle(.ypBlackDay)
+
+                    if viewModel.filteredRoutes.isEmpty {
+                        Text("Вариантов нет")
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity
+                            )
+                            .foregroundStyle(.ypBlackDay)
+                            .font(.system(size: 24, weight: .bold))
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 8) {
+                                ForEach(
+                                    viewModel.filteredRoutes
+                                ) { route in
+                                    NavigationLink {
+                                        CarrierInfoView(
+                                            carrier: route.carrier,
+                                            networkClient: networkClient
+                                        )
+                                    } label: {
+                                        RouteCardView(route: route)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .buttonStyle(.plain)
+                            .padding(.horizontal, 16)
                         }
+                    }
+
+                    NavigationLink {
+                        FiltersView(
+                            filters: viewModel.appliedFilters
+                        ) { newFilters in
+                            viewModel.applyFilters(newFilters)
+                        }
+                    } label: {
+                        Text("Уточнить время")
+                            .frame(
+                                maxWidth: .infinity,
+                                minHeight: 60,
+                                maxHeight: 60
+                            )
+                            .foregroundStyle(.ypJustWhite)
+                            .font(.system(size: 17, weight: .bold))
+                            .background(.ypBlue)
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 16)
+                            )
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 24)
                     }
                 }
             }
-            
-            NavigationLink {
-                FiltersView(filters: appliedFilters) { newFilters in
-                    appliedFilters = newFilters
-                }
-            } label: {
-                Text("Уточнить время")
-                    .frame(
-                        maxWidth: .infinity,
-                        minHeight: 60,
-                        maxHeight: 60,
-                    )
-                    .foregroundStyle(.ypJustWhite)
-                    .font(.system(size: 17, weight: .bold))
-                    .background(.ypBlue)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
-            }
         }
         .background(Color.ypWhiteDay.ignoresSafeArea())
-        .padding(.horizontal, 16)
+        .task {
+            await viewModel.loadRoutes()
+        }
         .toolbar(.hidden, for: .tabBar)
     }
 }
 
-
+#Preview {
+    NavigationStack {
+        CarrierListView(
+            departure: RoutePoint(
+                city: "Москва",
+                station: "Ленинградский вокзал",
+                stationCode: "test-1"
+            ),
+            destination: RoutePoint(
+                city: "Санкт-Петербург",
+                station: "Московский вокзал",
+                stationCode: "test-2"
+            ),
+            routes: MockData.routeOptions,
+            networkClient: try! NetworkClient(apiKey: "")
+        )
+    }
+}

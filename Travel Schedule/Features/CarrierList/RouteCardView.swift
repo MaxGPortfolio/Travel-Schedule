@@ -13,7 +13,9 @@ struct RouteCardView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 4) {
-                Image(route.carrier.logoName)
+                CarrierLogoView(
+                    logoName: route.carrier.logoName
+                )
                     .frame(
                         maxWidth: 38,
                         minHeight: 38,
@@ -88,23 +90,5 @@ struct RouteCardView: View {
         }
         .background(.ypJustLightGray)
         .clipShape(RoundedRectangle(cornerRadius: 24))
-    }
-}
-
-#Preview {
-    NavigationStack {
-        CarrierListView(
-            departure: RoutePoint(
-                city: "Москва",
-                station: "Ярославский вокзал",
-                stationCode: "test-1"
-            ),
-            destination: RoutePoint(
-                city: "Санкт-Петербург",
-                station: "Балтийский вокзал",
-                stationCode: "test-2"
-            ),
-            routes: MockData.routeOptions
-        )
     }
 }

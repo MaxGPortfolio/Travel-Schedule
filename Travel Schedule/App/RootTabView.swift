@@ -10,11 +10,13 @@ import SwiftUI
 struct RootTabView: View {
     @State private var selectedTab: AppTab = .schedule
     @State private var isDarkMode: Bool = false
+    
+    let networkClient: NetworkClient
 
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                ScheduleView()
+                ScheduleView(networkClient: networkClient)
             }
             .tabItem {
                 Image(
@@ -44,5 +46,7 @@ struct RootTabView: View {
 }
 
 #Preview {
-    RootTabView()
+    RootTabView(
+        networkClient: try! NetworkClient(apiKey: "")
+    )
 }

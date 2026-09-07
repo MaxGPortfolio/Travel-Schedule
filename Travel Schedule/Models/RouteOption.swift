@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RouteOption: Identifiable, Hashable {
+struct RouteOption: Identifiable, Hashable, Sendable {
     let id: UUID
     let carrier: Carrier
     let routeDate: Date

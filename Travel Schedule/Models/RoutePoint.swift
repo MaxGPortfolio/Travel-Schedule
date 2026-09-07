@@ -5,7 +5,7 @@
 //  Created by Максим on 28.07.2026.
 //
 
-struct RoutePoint: Hashable {
+struct RoutePoint: Hashable, Sendable {
     let city: String
     let station: String
     let stationCode: String
@@ -14,7 +14,3 @@ struct RoutePoint: Hashable {
             "\(city) (\(station))"
         }
 }
-
-//#Preview {
-//    RoutePoint()
-//}

@@ -8,27 +8,21 @@
 import SwiftUI
 
 struct CitySelectionView: View {
-    @State private var searchText = ""
+    @StateObject private var viewModel: CitySelectionViewModel
     @Environment(\.dismiss) private var dismiss
     
     let onRoutePointSelected: (RoutePoint) -> Void
     
-    private let cities = [
-            "Москва",
-            "Санкт-Петербург",
-            "Сочи",
-            "Горный воздух",
-            "Краснодар",
-            "Казань",
-            "Омск"
-        ]
-    
-    private var filteredCities: [String] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard !query.isEmpty else { return cities }
-        
-        return cities.filter { $0.localizedCaseInsensitiveContains(query) }
+    init(
+        networkClient: NetworkClient,
+        onRoutePointSelected: @escaping (RoutePoint) -> Void
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: CitySelectionViewModel(
+                networkClient: networkClient
+            )
+        )
+        self.onRoutePointSelected = onRoutePointSelected
     }
     
     var body: some View {
@@ -36,11 +30,11 @@ struct CitySelectionView: View {
             HStack(spacing: 2) {
                 Image(systemName: "magnifyingglass")
                 
-                TextField("Введите запрос", text: $searchText)
+                TextField("Введите запрос", text: $viewModel.searchText)
                 
-                if !searchText.isEmpty {
+                if !viewModel.searchText.isEmpty {
                     Button {
-                        searchText = ""
+                        viewModel.searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .tint(.ypGray)
@@ -58,21 +52,23 @@ struct CitySelectionView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             
-            if filteredCities.isEmpty {
+            if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let errorType = viewModel.errorType {
+                NetworkErrorView(errorType: errorType)
+            } else if viewModel.filteredCities.isEmpty {
                 Text("Город не найден")
                     .font(.system(size: 24, weight: .bold))
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity
-                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredCities, id: \.self) { city in
+                List(viewModel.filteredCities) { city in
                     NavigationLink {
                         StationSelectionView(
-                            stations: MockData.stationsByCity[city] ?? [],
+                            stations: city.stations,
                             onStationSelected: { station in
                                 let routePoint = RoutePoint(
-                                    city: city,
+                                    city: city.title,
                                     station: station.title,
                                     stationCode: station.code
                                 )
@@ -81,11 +77,11 @@ struct CitySelectionView: View {
                         )
                     } label: {
                         HStack {
-                            Text(city)
+                            Text(city.title)
                                 .foregroundStyle(.primary)
-
+                            
                             Spacer()
-
+                            
                             Image(systemName: "chevron.right")
                                 .foregroundStyle(.primary)
                         }
@@ -112,6 +108,9 @@ struct CitySelectionView: View {
                 .contentMargins(.top, 0, for: .scrollContent)
             }
         }
+        .task {
+            await viewModel.loadCities()
+        }
         .navigationTitle("Выбор города")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -130,7 +129,9 @@ struct CitySelectionView: View {
 
 #Preview {
     NavigationStack {
-        CitySelectionView { point in
+        CitySelectionView(
+            networkClient: try! NetworkClient(apiKey: "")
+        ) { point in
             print(point)
         }
     }

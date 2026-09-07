@@ -8,12 +8,22 @@
 import SwiftUI
 
 struct SettingsView: View {
-    //    @State private var errorType: NetworkErrorType = .server
-    @Binding var isDarkMode: Bool
+    @StateObject private var viewModel: SettingsViewModel
+    
+    init(isDarkMode: Binding<Bool>) {
+        _viewModel = StateObject(
+            wrappedValue: SettingsViewModel(
+                isDarkMode: isDarkMode.wrappedValue,
+                onThemeChanged: { newValue in
+                    isDarkMode.wrappedValue = newValue
+                }
+            )
+        )
+    }
     
     var body: some View {
         VStack(spacing: 0) {
-            Toggle("Темная тема", isOn: $isDarkMode)
+            Toggle("Темная тема", isOn: $viewModel.isDarkMode)
                 .frame(height: 60)
                 .font(.system(size: 17, weight: .regular))
                 .foregroundStyle(.ypBlackDay)
@@ -56,19 +66,3 @@ struct SettingsView: View {
 #Preview {
     SettingsView(isDarkMode: .constant(true))
 }
-
-// Раньше была заглушка с показом сетевой ошибки, пока не используется
-
-//#Preview("Server") {
-//    NetworkErrorView(errorType: .server)
-//}
-//
-//#Preview("No Internet") {
-//    NetworkErrorView(errorType: .noInternet)
-//}
-
-
-//NetworkErrorView(errorType: errorType)
-//    .onAppear {
-//        errorType = NetworkErrorType.allCases.randomElement() ?? .server
-//    }
