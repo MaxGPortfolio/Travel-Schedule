@@ -8,24 +8,19 @@
 import SwiftUI
 
 struct StationSelectionView: View {
-    @State private var searchText = ""
+    @StateObject private var viewModel: StationSelectionViewModel
+
     let onStationSelected: (Station) -> Void
-    
-    private let stations: [Station]
-    
-    private var filteredStations: [Station] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        guard !query.isEmpty else { return stations }
-        
-        return stations.filter { $0.title.localizedCaseInsensitiveContains(query) }
-    }
     
     init(
         stations: [Station],
         onStationSelected: @escaping (Station) -> Void
     ) {
-        self.stations = stations
+        _viewModel = StateObject(
+            wrappedValue: StationSelectionViewModel(
+                stations: stations
+            )
+        )
         self.onStationSelected = onStationSelected
     }
     
@@ -34,11 +29,11 @@ struct StationSelectionView: View {
             HStack(spacing: 2) {
                 Image(systemName: "magnifyingglass")
                 
-                TextField("Введите запрос", text: $searchText)
+                TextField("Введите запрос", text: $viewModel.searchText)
                 
-                if !searchText.isEmpty {
+                if !viewModel.searchText.isEmpty {
                     Button {
-                        searchText = ""
+                        viewModel.searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .tint(.ypGray)
@@ -56,7 +51,7 @@ struct StationSelectionView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
             
-            if filteredStations.isEmpty {
+            if viewModel.filteredStations.isEmpty {
                 Text("Станция не найдена")
                     .font(.system(size: 24, weight: .bold))
                     .frame(
@@ -64,7 +59,7 @@ struct StationSelectionView: View {
                         maxHeight: .infinity
                     )
             } else {
-                List(filteredStations, id: \.self) { station in
+                List(viewModel.filteredStations) { station in
                     Button {
                         onStationSelected(station)
                     } label: {

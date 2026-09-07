@@ -9,17 +9,17 @@ import SwiftUI
 
 struct FiltersView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel: FiltersViewModel
+    
     let onApply: (RouteFilters) -> Void
-    private var hasSelectedFilters: Bool {
-        !filters.selectedTimes.isEmpty || filters.showTransfers != nil
-    }
-    @State private var filters: RouteFilters
     
     init(
         filters: RouteFilters,
         onApply: @escaping (RouteFilters) -> Void
     ) {
-        _filters = State(initialValue: filters)
+        _viewModel = StateObject(
+            wrappedValue: FiltersViewModel(filters: filters)
+        )
         self.onApply = onApply
     }
     
@@ -37,13 +37,13 @@ struct FiltersView: View {
                         Spacer()
                         
                         Button {
-                            if filters.selectedTimes.contains(time) {
-                                filters.selectedTimes.remove(time)
-                            } else {
-                                filters.selectedTimes.insert(time)
-                            }
+                            viewModel.toggle(time)
                         } label: {
-                            Image(systemName: filters.selectedTimes.contains(time) ? "checkmark.square.fill" : "square")
+                            Image(
+                                systemName: viewModel.filters.selectedTimes.contains(time)
+                                ? "checkmark.square.fill"
+                                : "square"
+                            )
                         }
                         .buttonStyle(.plain)
                         .frame(width: 20, height: 20)
@@ -66,10 +66,12 @@ struct FiltersView: View {
                     Spacer()
                     
                     Button {
-                        filters.showTransfers = true
+                        viewModel.selectTransfers(true)
                     } label: {
                         Image(
-                            systemName: filters.showTransfers == true ? "largecircle.fill.circle" : "circle"
+                            systemName: viewModel.filters.showTransfers == true
+                            ? "largecircle.fill.circle"
+                            : "circle"
                         )
                         .foregroundStyle(.primary)
                     }
@@ -88,10 +90,12 @@ struct FiltersView: View {
                     Spacer()
                     
                     Button {
-                        filters.showTransfers = false
+                        viewModel.selectTransfers(false)
                     } label: {
                         Image(
-                            systemName: filters.showTransfers == false ? "largecircle.fill.circle" : "circle"
+                            systemName: viewModel.filters.showTransfers == false
+                            ? "largecircle.fill.circle"
+                            : "circle"
                         )
                         .foregroundStyle(.primary)
                     }
@@ -105,9 +109,9 @@ struct FiltersView: View {
             
             Spacer()
             
-            if hasSelectedFilters {
+            if viewModel.hasSelectedFilters {
                 Button {
-                    onApply(filters)
+                    onApply(viewModel.filters)
                     dismiss()
                 } label: {
                     Text("Применить")

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DepartureTime: String, CaseIterable, Hashable {
+enum DepartureTime: String, CaseIterable, Hashable, Sendable {
     case morning
     case day
     case evening

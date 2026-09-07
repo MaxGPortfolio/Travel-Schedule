@@ -9,34 +9,22 @@ import SwiftUI
 
 struct ScheduleView: View {
     @State private var selectedRoutePoint: RoutePointKind?
-    @State private var departure: RoutePoint?
-    @State private var destination: RoutePoint?
     @State private var selectedStoryGroup: StoryGroup?
-    @State private var viewedStoryGroupIDs: Set<Int> = []
+    @StateObject private var viewModel = ScheduleViewModel()
     
-    private var orderedStoryGroups: [StoryGroup] {
-        let unviewed = MockData.storyGroups.filter {
-            !viewedStoryGroupIDs.contains($0.id)
-        }
-
-        let viewed = MockData.storyGroups.filter {
-            viewedStoryGroupIDs.contains($0.id)
-        }
-
-        return unviewed + viewed
-    }
+    let networkClient: NetworkClient
     
     var body: some View {
         VStack(spacing: 20) {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 12) {
-                    ForEach(orderedStoryGroups) { storyGroup in
+                    ForEach(viewModel.orderedStoryGroups) { storyGroup in
                         Button {
                             selectedStoryGroup = storyGroup
                         } label: {
                             StoryCardView(
                                 storyGroup: storyGroup,
-                                isViewed: viewedStoryGroupIDs.contains(storyGroup.id)
+                                isViewed: viewModel.viewedStoryGroupIDs.contains(storyGroup.id)
                             )
                         }
                         .buttonStyle(.plain)
@@ -53,9 +41,9 @@ struct ScheduleView: View {
                             selectedRoutePoint = .departure
                         } label: {
                             HStack {
-                                Text(departure?.displayTitle ?? "Откуда")
+                                Text(viewModel.departure?.displayTitle ?? "Откуда")
                                     .foregroundStyle(
-                                        departure == nil ? .ypGray : .ypJustBlack
+                                        viewModel.departure == nil ? .ypGray : .ypJustBlack
                                     )
                                     .lineLimit(1)
                                 Spacer()
@@ -66,9 +54,9 @@ struct ScheduleView: View {
                             selectedRoutePoint = .destination
                         } label: {
                             HStack {
-                                Text(destination?.displayTitle ?? "Куда")
+                                Text(viewModel.destination?.displayTitle ?? "Куда")
                                     .foregroundStyle(
-                                        destination == nil ? .ypGray : .ypJustBlack
+                                        viewModel.destination == nil ? .ypGray : .ypJustBlack
                                     )
                                     .lineLimit(1)
                                 Spacer()
@@ -80,9 +68,7 @@ struct ScheduleView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     
                     Button {
-                        let previousDeparture = departure
-                        departure = destination
-                        destination = previousDeparture
+                        viewModel.swapRoutePoints()
                     } label: {
                         Image(.reverseButtonIcon)
                     }
@@ -92,13 +78,14 @@ struct ScheduleView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .padding(.horizontal, 16)
                 
-                if let departure,
-                   let destination {
+                if let departure = viewModel.departure,
+                   let destination = viewModel.destination {
                     NavigationLink {
                         CarrierListView(
                             departure: departure,
                             destination: destination,
-                            routes: MockData.routeOptions
+                            routes: [],
+                            networkClient: networkClient
                         )
                     } label: {
                         Text("Найти")
@@ -115,11 +102,26 @@ struct ScheduleView: View {
                 maxHeight: .infinity,
                 alignment: .top
             )
+            .fullScreenCover(item: $selectedRoutePoint) { routePointKind in
+                NavigationStack {
+                    CitySelectionView(
+                        networkClient: networkClient,
+                        onRoutePointSelected: { selectedPoint in
+                            viewModel.select(
+                                selectedPoint,
+                                for: routePointKind
+                            )
+                            
+                            selectedRoutePoint = nil
+                        }
+                    )
+                }
+            }
             .fullScreenCover(item: $selectedStoryGroup) { storyGroup in
                 StoriesView(
                     storyGroup: storyGroup,
                     onGroupViewed: {
-                        viewedStoryGroupIDs.insert(storyGroup.id)
+                        viewModel.markStoryGroupAsViewed(storyGroup)
                     }
                 )
             }
@@ -131,7 +133,8 @@ struct ScheduleView: View {
     }
 }
 
-
 #Preview {
-    ScheduleView()
+    ScheduleView(
+        networkClient: try! NetworkClient(apiKey: "")
+    )
 }

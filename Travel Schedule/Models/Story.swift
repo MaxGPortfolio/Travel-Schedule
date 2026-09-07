@@ -7,14 +7,14 @@
 
 import Foundation
 
-struct StoryGroup: Identifiable, Hashable {
+struct StoryGroup: Identifiable, Hashable, Sendable {
     let id: Int
     let previewImageName: String
     let previewTitle: String
     let stories: [Story]
 }
 
-struct Story: Identifiable, Hashable {
+struct Story: Identifiable, Hashable, Sendable {
     let id: Int
     let imageName: String
     let title: String

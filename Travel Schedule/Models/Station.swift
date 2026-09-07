@@ -5,7 +5,7 @@
 //  Created by Максим on 04.08.2026.
 //
 
-struct Station: Identifiable, Hashable {
+struct Station: Identifiable, Hashable, Sendable {
     let code: String
     let title: String
     
